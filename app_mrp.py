@@ -64,6 +64,7 @@ with st.form(key="Fform"):
         conjuntos_filtrados['Qtde'] = conjuntos_filtrados['Qtde'].astype(int)
         conjuntos_filtrados = conjuntos_filtrados.reset_index(drop=True)
         conjuntos_filtrados['Código'] = conjuntos_filtrados['Código'].astype(str)
+        conjuntos_filtrados = conjuntos_filtrados.groupby(['Código','Peca']).sum().reset_index()
 
         pecas_quantidade = conjuntos_filtrados.groupby(['Código','Peca']).sum().reset_index()
     
@@ -76,10 +77,33 @@ with st.form(key="Fform"):
 
         lista_conjuntos = list(conjuntos_filtrados['Código'])
 
-        teste = base_saldo[base_saldo['codigo'].isin(lista_conjuntos)].groupby(['codigo','4o. Agrupamento']).sum().reset_index()
+        saldo_filtrado = base_saldo[base_saldo['codigo'].isin(lista_conjuntos)].groupby(['codigo','4o. Agrupamento']).sum().reset_index()
+        
+        for i in range(len(saldo_filtrado)):
+            if saldo_filtrado['4o. Agrupamento'][i] == '':
+                saldo_filtrado['4o. Agrupamento'][i] = 'Finalizado' 
+        
+        colunas = list(saldo_filtrado['4o. Agrupamento'].drop_duplicates())
+        
+        for i in range(len(colunas)):
+            j = colunas[i]
+            saldo_filtrado[j] = ''
 
-        teste
-        base_saldo
+            for c in range(len(saldo_filtrado)):
+                if saldo_filtrado['4o. Agrupamento'][c] == j:
+                    saldo_filtrado[j][c] = saldo_filtrado['Saldo'][c]
+                else:
+                    pass
+
+        #for k in range(len(saldo_filtrado)):
+        #    if saldo_filtrado['4o. Agrupamento'][k].str.contains('Serras').any():
+        #        saldo_filtrado['4o. Agrupamento'][k] = 'Serras'
+
+        #saldo_filtrado['4o. Agrupamento'] = saldo_filtrado['4o. Agrupamento'].astype(str)
+        #saldo_filtrado['4o. Agrupamento'][43].str.contains('Serras')
+
+        saldo_filtrado
+        #base_saldo
         conjuntos_filtrados
-        st.dataframe(base_vendas)
-
+        #st.dataframe(base_vendas)
+        
